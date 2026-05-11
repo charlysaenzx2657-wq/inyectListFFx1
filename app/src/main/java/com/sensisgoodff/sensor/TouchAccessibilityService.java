@@ -2,7 +2,7 @@ package com.sensisgoodff.sensor;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.GestureDescription;
-import android.graphics.MotionEvent;
+import android.view.MotionEvent;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.ViewConfiguration;
