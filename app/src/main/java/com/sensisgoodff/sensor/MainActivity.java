@@ -5,7 +5,6 @@ import android.content.*;
 import android.os.*;
 import android.widget.Toast;
 import rikka.shizuku.Shizuku;
-import rikka.shizuku.ShizukuRemoteProcess;
 
 public class MainActivity extends Activity {
 
@@ -26,14 +25,16 @@ public class MainActivity extends Activity {
                 return;
             }
 
-            // Iniciar servicio via Shizuku con privilegios
-            ShizukuRemoteProcess process = Shizuku.newProcess(
-                new String[]{"am", "startforegroundservice",
-                    "com.sensisgoodff.sensor/.SensorService"},
-                null, null);
-            process.waitFor();
+            // Iniciar servicio normal
+            Intent i = new Intent(this, SensorService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(i);
+            } else {
+                startService(i);
+            }
 
             Toast.makeText(this, "⚡ Sensor iniciado", Toast.LENGTH_SHORT).show();
+
         } catch (Exception e) {
             Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
