@@ -11,9 +11,11 @@ public class SensorService extends Service implements SensorEventListener {
     private static final String TAG = "SensisFF";
     private static final String CHANNEL_ID = "sensis_sensor";
 
-    private static final float GYRO_FAST = 4.0f;
-    private static final float GYRO_MID  = 1.8f;
+    private static final float GYRO_FAST = 3.5f;
+    private static final float GYRO_MID  = 1.5f;
+    private static final float ALPHA = 0.3f;
 
+    private float smoothedMag = 0f;
     private SensorManager sensorManager;
     private Sensor gyroscope;
     private Handler applyHandler;
@@ -28,6 +30,7 @@ public class SensorService extends Service implements SensorEventListener {
             if (level != lastAppliedLevel) {
                 ShizukuHelper.applyLevel(SensorService.this, level);
                 lastAppliedLevel = level;
+                Log.d(TAG, "Nivel=" + level + " gyro=" + smoothedMag);
             }
             applyHandler.postDelayed(this, 16);
         }
@@ -37,30 +40,22 @@ public class SensorService extends Service implements SensorEventListener {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "SensorService onCreate");
-
         createNotificationChannel();
-
-        try {
-            startForeground(1, buildNotification(true));
-            Log.d(TAG, "Foreground iniciado");
-        } catch (Exception e) {
-            Log.e(TAG, "Error foreground: " + e.getMessage());
-        }
+        startForeground(1, buildNotification());
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         if (sensorManager != null) {
             gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
             if (gyroscope != null) {
                 sensorManager.registerListener(this, gyroscope, 10000, 10000);
-                Log.d(TAG, "Gyroscopio registrado");
+                Log.d(TAG, "Gyro OK");
             } else {
-                Log.w(TAG, "Gyroscopio no disponible");
+                Log.w(TAG, "Gyro NO disponible");
             }
         }
 
         applyHandler = new Handler(Looper.getMainLooper());
         applyHandler.post(applyRunnable);
-        Log.d(TAG, "SensorService activo");
     }
 
     @Override
@@ -69,10 +64,13 @@ public class SensorService extends Service implements SensorEventListener {
         float x = event.values[0];
         float y = event.values[1];
         float z = event.values[2];
-        float mag = (float) Math.sqrt(x*x + y*y + z*z);
+        float rawMag = (float) Math.sqrt(x*x + y*y + z*z);
+        smoothedMag = ALPHA * rawMag + (1f - ALPHA) * smoothedMag;
 
-        if (mag >= GYRO_FAST) pendingLevel = 2;
-        else if (mag >= GYRO_MID) pendingLevel = 1;
+        Log.d(TAG, "gyro mag=" + smoothedMag);
+
+        if (smoothedMag >= GYRO_FAST) pendingLevel = 2;
+        else if (smoothedMag >= GYRO_MID) pendingLevel = 1;
         else pendingLevel = 0;
     }
 
@@ -96,18 +94,16 @@ public class SensorService extends Service implements SensorEventListener {
     @Override
     public IBinder onBind(Intent intent) { return null; }
 
-    private Notification buildNotification(boolean active) {
+    private Notification buildNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_IMMUTABLE);
-
         return new Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle(active ? "⚡ Sensor activo" : "⚠️ Sensor desactivado")
-                .setContentText(active ? "Optimizando sensibilidad en tiempo real"
-                        : "Toca para activar")
+                .setContentTitle("⚡ Sensor activo")
+                .setContentText("Optimizando sensibilidad en tiempo real")
                 .setSmallIcon(android.R.drawable.ic_menu_compass)
                 .setContentIntent(pi)
-                .setOngoing(active)
+                .setOngoing(true)
                 .build();
     }
 
