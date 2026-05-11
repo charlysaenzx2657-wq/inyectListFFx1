@@ -32,15 +32,17 @@ jobs:
             -validity 10000 \
             -storepass sensisgoodff123 \
             -keypass sensisgoodff123 \
-            -dname "CN=SENSIS, OU=FF, O=SENSIS, L=MX, S=MX, C=MX"
-          
-          $ANDROID_HOME/build-tools/33.0.1/apksigner sign \
-            --ks key.jks \
-            --ks-alias sensisgoodff \
-            --ks-pass pass:sensisgoodff123 \
-            --key-pass pass:sensisgoodff123 \
-            --out app/build/outputs/apk/debug/SensisFF-signed.apk \
-            app/build/outputs/apk/debug/app-debug.apk
+            -dname "CN=SENSIS, OU=FF, O=SENSIS, L=MX, ST=MX, C=MX"
+
+          jarsigner -verbose \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            -keystore key.jks \
+            -storepass sensisgoodff123 \
+            -keypass sensisgoodff123 \
+            -signedjar app/build/outputs/apk/debug/SensisFF-signed.apk \
+            app/build/outputs/apk/debug/app-debug.apk \
+            sensisgoodff
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
