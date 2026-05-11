@@ -11,8 +11,8 @@ public class SensorService extends Service implements SensorEventListener {
     private static final String TAG = "SensisFF";
     private static final String CHANNEL_ID = "sensis_sensor";
 
-    private static final float GYRO_FAST = 2.5f;
-    private static final float GYRO_MID  = 1.0f;
+    private static final float GYRO_FAST = 4.0f;
+    private static final float GYRO_MID  = 1.8f;
 
     private SensorManager sensorManager;
     private Sensor gyroscope;
