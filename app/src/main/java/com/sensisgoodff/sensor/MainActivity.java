@@ -3,7 +3,7 @@ package com.sensisgoodff.sensor;
 import android.app.Activity;
 import android.content.*;
 import android.os.*;
-import android.util.Log;
+import android.widget.Toast;
 import rikka.shizuku.Shizuku;
 
 public class MainActivity extends Activity {
@@ -11,26 +11,24 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("SensisFF", "onCreate");
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            try {
-                if (Shizuku.pingBinder()) {
-                    if (Shizuku.checkSelfPermission() != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                        Shizuku.requestPermission(1001);
-                    }
+        try {
+            if (Shizuku.pingBinder()) {
+                if (Shizuku.checkSelfPermission() != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    Shizuku.requestPermission(1001);
                 }
-                Intent i = new Intent(this, SensorService.class);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(i);
-                } else {
-                    startService(i);
-                }
-                Log.d("SensisFF", "Servicio iniciado OK");
-            } catch (Exception e) {
-                Log.e("SensisFF", "Error: " + e.getMessage());
             }
-            finish();
-        }, 500);
+            Intent i = new Intent(this, SensorService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(i);
+            } else {
+                startService(i);
+            }
+            Toast.makeText(this, "⚡ Sensor iniciado", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        new Handler(Looper.getMainLooper()).postDelayed(this::finish, 1500);
     }
 }
