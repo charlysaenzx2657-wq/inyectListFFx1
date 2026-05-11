@@ -24,8 +24,26 @@ jobs:
       - name: Build Debug APK
         run: gradle assembleDebug
 
+      - name: Sign APK
+        run: |
+          keytool -genkey -v -keystore key.jks \
+            -alias sensisgoodff \
+            -keyalg RSA -keysize 2048 \
+            -validity 10000 \
+            -storepass sensisgoodff123 \
+            -keypass sensisgoodff123 \
+            -dname "CN=SENSIS, OU=FF, O=SENSIS, L=MX, S=MX, C=MX"
+          
+          $ANDROID_HOME/build-tools/33.0.1/apksigner sign \
+            --ks key.jks \
+            --ks-alias sensisgoodff \
+            --ks-pass pass:sensisgoodff123 \
+            --key-pass pass:sensisgoodff123 \
+            --out app/build/outputs/apk/debug/SensisFF-signed.apk \
+            app/build/outputs/apk/debug/app-debug.apk
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: SensisFF-Sensor
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/SensisFF-signed.apk
