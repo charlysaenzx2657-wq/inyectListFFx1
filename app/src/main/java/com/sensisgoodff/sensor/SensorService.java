@@ -73,7 +73,7 @@ public class SensorService extends Service implements SensorEventListener {
 
         if (mag >= GYRO_FAST) pendingLevel = 2;
         else if (mag >= GYRO_MID) pendingLevel = 1;
-        else pendingLevel = 0;
+        else { pendingLevel = 0; Log.d(TAG, "gyro mag=" + smoothedMag); }
     }
 
     @Override
