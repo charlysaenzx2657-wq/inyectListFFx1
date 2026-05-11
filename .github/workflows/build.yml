@@ -24,29 +24,28 @@ jobs:
       - name: Build Debug APK
         run: gradle assembleDebug
 
-      - name: Zipalign y Sign APK
+      - name: Sign APK
         run: |
-          keytool -genkey -v -keystore key.jks \
+          keytool -genkeypair -v \
+            -keystore key.jks \
             -alias sensisgoodff \
             -keyalg RSA -keysize 2048 \
             -validity 10000 \
             -storepass sensisgoodff123 \
             -keypass sensisgoodff123 \
-            -dname "CN=SENSIS, OU=FF, O=SENSIS, L=MX, ST=MX, C=MX"
+            -dname "CN=SENSIS,OU=FF,O=SENSIS,L=MX,ST=MX,C=MX"
 
-          $ANDROID_HOME/build-tools/33.0.1/zipalign -v 4 \
+          $ANDROID_HOME/build-tools/33.0.1/zipalign -f -v 4 \
             app/build/outputs/apk/debug/app-debug.apk \
             app/build/outputs/apk/debug/app-aligned.apk
 
-          jarsigner -verbose \
-            -sigalg SHA256withRSA \
-            -digestalg SHA-256 \
-            -keystore key.jks \
-            -storepass sensisgoodff123 \
-            -keypass sensisgoodff123 \
-            -signedjar app/build/outputs/apk/debug/SensisFF-signed.apk \
-            app/build/outputs/apk/debug/app-aligned.apk \
-            sensisgoodff
+          $ANDROID_HOME/build-tools/33.0.1/apksigner sign \
+            --ks key.jks \
+            --ks-key-alias sensisgoodff \
+            --ks-pass pass:sensisgoodff123 \
+            --key-pass pass:sensisgoodff123 \
+            --out app/build/outputs/apk/debug/SensisFF-signed.apk \
+            app/build/outputs/apk/debug/app-aligned.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
