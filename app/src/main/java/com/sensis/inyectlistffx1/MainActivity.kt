@@ -15,7 +15,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import rikka.shizuku.Shizuku
-import rikka.shizuku.ShizukuRemoteProcess
 
 class MainActivity : AppCompatActivity() {
 
@@ -54,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             var ok = 0; var fail = 0
             commands.forEachIndexed { i, cmd ->
                 handler.post { ui.logLine(cmd, i + 1, total) }
-                try { execShizuku(cmd); ok++ }
+                try { execCmd(cmd); ok++ }
                 catch (e: Exception) { handler.post { ui.logError(cmd) }; fail++ }
                 Thread.sleep(10)
             }
@@ -65,9 +64,10 @@ class MainActivity : AppCompatActivity() {
         }.start()
     }
 
-    fun execShizuku(cmd: String) {
-        val p: ShizukuRemoteProcess = Shizuku.newProcess(arrayOf("sh","-c",cmd), null, null)
-        p.waitFor(); p.destroy()
+    fun execCmd(cmd: String) {
+        val proc = Runtime.getRuntime().exec(arrayOf("sh", "-c", cmd))
+        proc.waitFor()
+        proc.destroy()
     }
 
     fun sendNotif(title: String, msg: String) {

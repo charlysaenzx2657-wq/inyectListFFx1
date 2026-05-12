@@ -153,7 +153,7 @@ class MainUI(private val activity: MainActivity) {
                 ViewGroup.LayoutParams.WRAP_CONTENT
             ).also { it.bottomMargin = dp(12) }
             setPadding(0, dp(14), 0, dp(14))
-            setOnClickListener { attemptLogin() }
+            setOnClickListener { checkLoginAndProceed() }
         }
 
         val savePwRow = LinearLayout(activity).apply {
@@ -184,6 +184,7 @@ class MainUI(private val activity: MainActivity) {
             tag = "errorTxt"
         }
 
+        fun checkLoginAndProceed() { val pw = pwInput.text.toString(); if (checkPassword(pw)) { if (savePwCb.isChecked) prefs.edit().putString("saved_pw_enc", obfuscate(pw)).apply() else prefs.edit().remove("saved_pw_enc").apply(); animateLoginSuccess() } else { shakeView(pwInput) } }
         loginBtn.setOnClickListener {
             val pw = pwInput.text.toString()
             if (checkPassword(pw)) {
