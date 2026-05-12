@@ -350,7 +350,7 @@ class MainUI(private val activity: MainActivity) {
 
     private fun checkPassword(pw: String): Boolean {
         val hash = sha256("GTinj_s3cur3${pw}GTinj_s3cur3")
-        return hash == "366d0dc2ea33810dc8089ee959ad1b7c50e06d468d3a1880b4f995b43a424261"
+        return hash == "03d41beb0a5111e9faf64af4e3849cd84e0914ae052be41d17acfbe3e2e58b39"
     }
 
     private fun sha256(input: String): String {
