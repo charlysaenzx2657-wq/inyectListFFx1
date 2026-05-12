@@ -42,7 +42,7 @@ public class SensorService extends Service implements SensorEventListener {
         @Override
         public void run() {
             try {
-                Process p = Runtime.getRuntime().exec(
+                java.lang.Process p = Runtime.getRuntime().exec(
                     new String[]{"sh", "-c", "ps | grep sensor.sh | grep -v grep"});
                 p.waitFor();
                 if (p.exitValue() != 0) {
