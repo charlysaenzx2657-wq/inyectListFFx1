@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Java 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -50,8 +50,8 @@ jobs:
             app/build/outputs/apk/release/SENSIS-GOOD-FF-signed.apk \
             && echo "✅ APK firmado correctamente"
 
-      - name: Subir APK firmado como artefacto
-        uses: actions/upload-artifact@v3
+      - name: Subir APK firmado
+        uses: actions/upload-artifact@v4
         with:
           name: SENSIS-GOOD-FF-v2-SIGNED
           path: app/build/outputs/apk/release/SENSIS-GOOD-FF-signed.apk
