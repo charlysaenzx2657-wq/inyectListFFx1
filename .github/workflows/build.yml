@@ -22,12 +22,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Descargar gradle-wrapper.jar
+      - name: Instalar Gradle y generar wrapper
         run: |
-          curl -L "https://services.gradle.org/distributions/gradle-8.0-bin.zip" -o gradle-8.0.zip
-          unzip gradle-8.0.zip "*/lib/gradle-wrapper.jar" -d tmp-gradle
-          find tmp-gradle -name "gradle-wrapper.jar" -exec cp {} gradle/wrapper/gradle-wrapper.jar \;
-          rm -rf gradle-8.0.zip tmp-gradle
+          wget -q "https://services.gradle.org/distributions/gradle-8.0-bin.zip" -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /tmp/gradle
+          /tmp/gradle/gradle-8.0/bin/gradle wrapper --gradle-version 8.0 --project-dir .
 
       - name: Dar permisos a gradlew
         run: chmod +x gradlew
