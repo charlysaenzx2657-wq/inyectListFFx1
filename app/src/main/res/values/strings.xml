@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">SensisFF Sensor</string>
-    <string name="accessibility_label">SENSIS GOOD FF Sensor</string>
-    <string name="accessibility_desc">Optimiza sensibilidad en tiempo real</string>
-    <string name="notif_channel">Sensor SENSIS FF</string>
-    <string name="notif_active">⚡ Sensor activo — optimizando</string>
-    <string name="notif_disabled">⚠️ Sensor desactivado — toca para activar</string>
-</resources>
