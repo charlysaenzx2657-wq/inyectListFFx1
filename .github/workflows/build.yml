@@ -29,7 +29,7 @@ jobs:
         run: ./gradlew assembleRelease --no-daemon
 
       - name: Subir APK como artefacto
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: SENSIS-GOOD-FF-v2.apk
           path: app/build/outputs/apk/release/app-release-unsigned.apk
