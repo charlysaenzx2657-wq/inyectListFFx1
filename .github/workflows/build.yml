@@ -22,6 +22,12 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Descargar gradle-wrapper.jar
+        run: |
+          curl -L "https://services.gradle.org/distributions/gradle-8.0-bin.zip" -o gradle-8.0.zip
+          unzip -p gradle-8.0.zip "gradle-8.0/lib/gradle-wrapper.jar" > gradle/wrapper/gradle-wrapper.jar
+          rm gradle-8.0.zip
+
       - name: Dar permisos a gradlew
         run: chmod +x gradlew
 
