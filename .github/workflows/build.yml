@@ -19,16 +19,39 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.0'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Dar permisos a gradlew
+        run: chmod +x gradlew
 
       - name: Build APK Release
-        run: gradle assembleRelease --no-daemon
+        run: ./gradlew assembleRelease --no-daemon
 
-      - name: Subir APK
-        uses: actions/upload-artifact@v4
+      - name: Decodificar keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > sensis-key.jks
+
+      - name: Firmar APK con apksigner
+        run: |
+          BUILD_TOOLS=$(ls $ANDROID_HOME/build-tools/ | sort -V | tail -1)
+          $ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner sign \
+            --ks sensis-key.jks \
+            --ks-key-alias "${{ secrets.KEY_ALIAS }}" \
+            --ks-pass pass:"${{ secrets.KEY_PASS }}" \
+            --key-pass pass:"${{ secrets.KEY_PASS }}" \
+            --out app/build/outputs/apk/release/SENSIS-GOOD-FF-signed.apk \
+            app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Verificar firma
+        run: |
+          BUILD_TOOLS=$(ls $ANDROID_HOME/build-tools/ | sort -V | tail -1)
+          $ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner verify \
+            app/build/outputs/apk/release/SENSIS-GOOD-FF-signed.apk \
+            && echo "✅ APK firmado correctamente"
+
+      - name: Subir APK firmado como artefacto
+        uses: actions/upload-artifact@v3
         with:
-          name: SENSIS-GOOD-FF-v2
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          name: SENSIS-GOOD-FF-v2-SIGNED
+          path: app/build/outputs/apk/release/SENSIS-GOOD-FF-signed.apk
